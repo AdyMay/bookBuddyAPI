@@ -1,5 +1,5 @@
 const express = require("express");
-const userRouter = expree.Router();
+const userRouter = express.Router();
 
 // {baseUrl/users/me}
 userRouter.get("/me", (req, res) => {

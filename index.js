@@ -5,6 +5,14 @@ const app = express();
 
 const PORT = 3000;
 
+require("dotenv").config();
+
+const client = require("./db/client");
+
+client.connect();
+
+console.log(process.env.TEST_VAR);
+
 app.use(express.json());
 // registering routes in /api/index.js -> IOW, request to /api -> send requesto to /api/index.js
 app.use("/api", require("./api"));
