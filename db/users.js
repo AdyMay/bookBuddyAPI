@@ -6,6 +6,7 @@ const creatUser = async ({ firstname, lastname, email, password }) => {
     const {
       rows: [user],
     } = await client.query(SQL, [firstname, lastname, email, password]);
+    console.log(user);
 
     return user;
   } catch (err) {
