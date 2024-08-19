@@ -6,7 +6,7 @@ const bookRouter = express.Router();
 
 // {baseUrl}/api/books
 bookRouter.get("/", (req, res) => {
-  res.send("here are the books");
+  res.send("here are all the books");
 });
 
 module.exports = bookRouter;
