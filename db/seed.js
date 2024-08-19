@@ -1,7 +1,7 @@
 require("dotenv").config();
 
 const client = require("./client");
-const { createUser } = require("./users");
+const { createUser, getUserByEmail } = require("./users");
 // import createBook
 
 const users = [
@@ -90,13 +90,15 @@ const seedDatabase = async () => {
     console.log("CREATING TABLES...");
     await createTables();
     console.log("TABLES SUCCESSFULLY CREATED");
-    await createUser([0]);
     console.log("INSERTING USERS...");
     await insertUsers();
     console.log("USERS ADDES SUCCESSFULLY");
+    await getUserByEmail("alice@example.com");
   } catch (err) {
     console.log(err);
   } finally {
     client.end();
   }
 };
+
+seedDatabase();

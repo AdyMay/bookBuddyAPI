@@ -14,6 +14,15 @@ const creatUser = async ({ firstname, lastname, email, password }) => {
   }
 };
 
-// const getUserByEmail(email)
+const getUserByEmail = async (email) => {
+  try {
+    const SQL = `SELECT * FROM users WHERE email=$1`;
+    const {
+      row: [result],
+    } = await client.query(SQL, [email]);
+    console.log(result);
+    return result;
+  } catch (err) {}
+};
 
 modult.exports = { createUser };
