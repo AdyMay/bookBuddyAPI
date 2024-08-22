@@ -2,30 +2,27 @@ require("dotenv").config();
 
 const client = require("./client");
 const { createUser, getUserByEmail } = require("./users");
-const { createBook } = require("./books");
-// import createBook
+const { createBook, getBooks } = require("./books");
 
 const users = [
-  [
-    {
-      firstname: "Alice",
-      lastname: "Johnson",
-      email: "alice@example.com",
-      password: "alice123",
-    },
-    {
-      firstname: "Bob",
-      lastname: "Smith",
-      email: "bob@example.com",
-      password: "bob456",
-    },
-    {
-      firstname: "Charlie",
-      lastname: "Brown",
-      email: "charlie@example.com",
-      password: "charlie789",
-    },
-  ],
+  {
+    firstname: "Alice",
+    lastname: "Johnson",
+    email: "alice@example.com",
+    password: "alice123",
+  },
+  {
+    firstname: "Bob",
+    lastname: "Smith",
+    email: "bob@example.com",
+    password: "bob456",
+  },
+  {
+    firstname: "Charlie",
+    lastname: "Brown",
+    email: "charlie@example.com",
+    password: "charlie789",
+  },
 ];
 
 const books = [
@@ -38,6 +35,7 @@ const books = [
       "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/The_Great_Gatsby_Cover_1925_Retouched.jpg/440px-The_Great_Gatsby_Cover_1925_Retouched.jpg",
     available: false,
   },
+
   {
     title: "To Kill a Mockingbird",
     author: "Harper Lee",
@@ -69,41 +67,38 @@ const books = [
 
 const dropTables = async () => {
   try {
-    await client.query(`DROP TABLE IF EXIST users`);
-    //DROP TABLE and RUN
+    await client.query(`DROP TABLE IF EXISTS users`);
+    // write another DROP TABLE query and run it here for books table
     await client.query(`DROP TABLE IF EXISTS books`);
   } catch (err) {
     console.log(err);
   }
 };
 
-// SQL / query lang.
 const createTables = async () => {
   try {
-    await client.query(
-      `CREATE TABLE USERS (
-        id SERIAL PRIMARY KEY,
-        firstname VARCHAR(64),
-        lastname VARCHAR(64),
-        email VARCHAR(64) UNIQUE NOT NULL,
-        password VARCHAR(255) NOT NULL
-        )`
-    );
+    await client.query(`
+        CREATE TABLE users(
+            id SERIAL PRIMARY KEY,
+            firstname VARCHAR(64),
+            lastname VARCHAR(64),
+            email VARCHAR(64) UNIQUE NOT NULL,
+            password VARCHAR(255) NOT NULL
+        )`);
 
-    // CREATE TABLE and RUN
-    //Id, Title 255 not null, Author 128 not null, Description 1024, cover img 255 in Channel
-    //boolean default true
+    // write another CREATE TABLE query for books and run it here
+    // id - primary key, title - vc255 NOT NULL, author varchar 128 NOT NULL, description  vc1024,
+    // coverimage vc255 (coverImage VARCHAR(255) DEFAULT 'https://images.pexels.com/photos/7034646/pexels-photo-7034646.jpeg')
+    // available boolean DEFAULT true
 
-    await client.query(
-      `CREATE TABLE books (
+    await client.query(`CREATE TABLE books(
         id SERIAL PRIMARY KEY,
         title VARCHAR(255) NOT NULL,
         author VARCHAR(127) NOT NULL,
         description VARCHAR(1023),
-        coverimage VARCHAR (255) DEFAULT 'https://images.pexels.com/photos/7034646/pexels-photo-7034646.jpeg',
+        coverimage VARCHAR(255) DEFAULT 'https://images.pexels.com/photos/7034646/pexels-photo-7034646.jpeg',
         available BOOLEAN DEFAULT TRUE
-        )`
-    );
+        )`);
   } catch (err) {
     console.log(err);
   }
@@ -119,20 +114,32 @@ const insertUsers = async () => {
   }
 };
 
-// create function insert books that loops over the books aray above and inserts into the database
+const insertBooks = async () => {
+  try {
+    for (const book of books) {
+      await createBook(book);
+    }
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+// TODO create function insertBooks that loops over the books array above and inserts each one into the DB
 
 const seedDatabase = async () => {
   try {
     client.connect();
     console.log("DROPPING TABLES...");
     await dropTables();
-    console.log("TABLES DROPPED");
+    console.log("TABLES DROPPED.");
     console.log("CREATING TABLES...");
     await createTables();
-    console.log("TABLES SUCCESSFULLY CREATED");
+    console.log("TABLES SUCCESSFULLY CREATED!");
     console.log("INSERTING USERS...");
     await insertUsers();
-    console.log("USERS ADDES SUCCESSFULLY");
+    console.log("USERS ADDED SUCCESSFULLY!");
+    console.log("INSERTING BOOKS...");
+    await insertBooks();
   } catch (err) {
     console.log(err);
   } finally {
