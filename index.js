@@ -1,25 +1,16 @@
-// (check point) console.log("Hello World!");
-
 const express = require("express");
 const app = express();
-
+require("dotenv").config();
+const client = require("./db/client");
+client.connect();
 const PORT = 3000;
 
-require("dotenv").config();
-
-const client = require("./db/client");
-
-client.connect();
-
-console.log(process.env.TEST_VAR);
-
 app.use(express.json());
-// registering routes in /api/index.js -> IOW, request to /api -> send requesto to /api/index.js
+// we're registering the routes in /api/index.js ===> IOW, request to /api ---> send request to /api/index.js
 app.use("/api", require("./api"));
 
-// localhost:3000/api
 app.get("/", (req, res) => {
-  res.send("Hello from the Server");
+  res.send("Hello from our server");
 });
 
 app.listen(PORT, () => {
