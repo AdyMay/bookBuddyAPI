@@ -6,13 +6,15 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon index.js",
-    "seed:dev":"nodemon ./db/seed.js"
+    "seed:dev": "nodemon ./db/seed.js"
   },
   "author": "lindseyadysonhuddleston",
   "license": "ISC",
   "dependencies": {
+    "bcrypt": "^5.1.1",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2",
     "nodemon": "^3.1.4",
     "pg": "^8.12.0"
   }
