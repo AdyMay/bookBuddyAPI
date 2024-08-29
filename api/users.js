@@ -40,7 +40,7 @@ userRouter.get("/me", (req, res) => {
 userRouter.post("/register", async (req, res) => {
   const { firstname, lastname, email, password } = req.body;
   if (!email) {
-    next("Email not provided!");
+    next({ name: "EmailRequiredError", message: "" });
     return;
   }
   if (!password) {
@@ -50,18 +50,23 @@ userRouter.post("/register", async (req, res) => {
   try {
     const existingUser = await getUserByEmail(email);
     if (existingUser) {
-      res.send("User already registered with that email");
+      next({
+        name: "ExistingUserError",
+        message: "user already registered with that email",
+      });
       return;
     }
 
     const result = await createUser(req.body);
     if (result) {
-      //TODO(check) userRouter may be result
       const token = jwt.sign(
         { id: userRouter.id, email },
         process.env.JWT_SECRET,
-        { expiresIn: "1w" }
+        {
+          expiresIn: "1w",
+        }
       );
+      console.log(token);
       res.send({
         message: "Registration Successful!",
         token,
@@ -72,13 +77,16 @@ userRouter.post("/register", async (req, res) => {
           email: result.email,
         },
       });
+      return;
     } else {
-      res.send("error registering, try later");
+      next({
+        name: "RegistrationError",
+        message: "error registering, try later",
+      });
       return;
     }
-    res.send("Success");
   } catch (err) {
-    res.send(err);
+    next(err);
   }
 });
 
