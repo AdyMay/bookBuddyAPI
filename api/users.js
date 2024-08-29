@@ -1,10 +1,11 @@
 const express = require("express");
+
 const userRouter = express.Router();
 const {
   getUserById,
-  getUser,
-  getUsers,
   getUserByEmail,
+  getUsers,
+  getUser,
   createUser,
 } = require("../db/users");
 
@@ -15,68 +16,96 @@ userRouter.get("/", async (req, res) => {
     const results = await getUsers();
     res.send(results);
   } catch (err) {
-    res.send({ err, message: "something went wrong" });
+    res.send({ err, message: "Something went wrong" });
   }
 });
 
-// {baseUrl}/users/id
-// userRouter.get("/:id", async (req, res) => {
-//   try {
-//     const { id } = req.params;
-//     const result = await getUserById(id);
-//     res.send(result);
-//   } catch (err) {
-//     res.send({ err, message: "something went wrong" });
-//   }
-// });
-
-// {baseUrl}/users/me
-userRouter.get("/me", (req, res) => {
-  res.send("here is your account info");
+// {baseURL}/users/:id
+userRouter.get("/", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await getUserById(id);
+    res.send(result);
+  } catch (err) {
+    res.send({ err, message: "Something went wrong" });
+  }
 });
 
-// POST request to {baseUrl}/api/users/register
+// {baseURL}/users/me
+userRouter.get("/me", (req, res) => {
+  res.send("Here is your account information");
+});
+
+// POST request to {baseURL/api/users/register}
 userRouter.post("/register", async (req, res) => {
   const { firstname, lastname, email, password } = req.body;
   if (!email) {
-    res.send("Email not provided!");
+    next("Email not provided!");
     return;
   }
   if (!password) {
     res.send("Password not provided!");
     return;
-    // do something here
   }
   try {
     const existingUser = await getUserByEmail(email);
     if (existingUser) {
-      res.send("user already registered with that email");
+      res.send("User already registered with that email");
       return;
     }
+
     const result = await createUser(req.body);
     if (result) {
+      //TODO(check) userRouter may be result
+      const token = jwt.sign(
+        { id: userRouter.id, email },
+        process.env.JWT_SECRET,
+        { expiresIn: "1w" }
+      );
+      res.send({
+        message: "Registration Successful!",
+        token,
+        user: {
+          id: result.id,
+          firstname: result.firstname,
+          lastname: result.lastname,
+          email: result.email,
+        },
+      });
     } else {
       res.send("error registering, try later");
       return;
     }
-    console.log(result);
-    res.send("success");
+    res.send("Success");
   } catch (err) {
     res.send(err);
   }
 });
 
+// POST request to {baseURL/api/login}
 userRouter.post("/login", async (req, res) => {
-  console.log(req.body.email);
   const { email, password } = req.body;
   if (!email || !password) {
-    res.send("missing credentials - must supply both email and password");
-    return;
+    next({
+      name: "MissingCredentialsError",
+      message: "Please supply both email and password",
+    });
   }
   try {
-    const result = await getUser(req.body);
-    console.log(result);
-    res.send("You logged in successfully!");
+    const result = await getUser(req.body.email);
+    if (result) {
+      // create you token here and send with user id and email
+      const token = jwt.sign({ id: result.id, email }, process.env.JWT_SECRET, {
+        expiresIn: "1w",
+      });
+      res.send({ message: "Login Successful!", token });
+    } else {
+      next({
+        name: "IncorrectCredentialsError",
+        message: "Username or password is incorrect",
+      });
+    }
+    res.send("User logged in");
   } catch (err) {
     res.send("something went wrong");
   }
@@ -84,7 +113,8 @@ userRouter.post("/login", async (req, res) => {
 
 userRouter.get("/test", async (req, res, next) => {
   try {
-    resjson();
+    //TODO
+    res.json();
   } catch (err) {
     next(err);
   }
