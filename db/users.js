@@ -2,7 +2,12 @@ const client = require("./client");
 const bcrypt = require("bcrypt");
 const SALT_COUNT = 10;
 
-const createUser = async ({ firstname, lastname, email, password }) => {
+const createUser = async ({
+  firstname = "Default",
+  lastname = "Default",
+  email,
+  password,
+}) => {
   try {
     const hashedPassword = await bcrypt.hash(password, SALT_COUNT);
     const SQL = `INSERT INTO users(firstname, lastname, email, password) VALUES($1, $2, $3, $4) ON CONFLICT(email) DO NOTHING RETURNING id, firstname, lastname, email`;

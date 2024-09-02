@@ -112,6 +112,11 @@ const createTables = async () => {
                 password VARCHAR(255) NOT NULL
             )`);
 
+    //Write another CREATE TABLE QUERY for books and run it here
+    // id - primary key, title - vc255 NOT NULL, author varchar 128 NOT NULL, description  vc1024,
+    // coverimage vc255 (coverImage VARCHAR(255) DEFAULT 'https://images.pexels.com/photos/7034646/pexels-photo-7034646.jpeg')
+    // available boolean DEFAULT true
+
     await client.query(`CREATE TABLE books(
                 id SERIAL PRIMARY KEY,
                 title VARCHAR(255) NOT NULL,

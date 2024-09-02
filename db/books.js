@@ -1,3 +1,9 @@
+// TODO(Books) Create a function createBook(){
+/* author,
+    description,
+    coverImage,
+    available,})
+*/
 const client = require("./client");
 
 const getBooks = async () => {
