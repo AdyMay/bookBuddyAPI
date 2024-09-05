@@ -1,4 +1,4 @@
-//index.js in /api
+//TODO
 const express = require("express");
 const apiRouter = express.Router();
 const jwt = require("jsonwebtoken");
@@ -10,6 +10,7 @@ apiRouter.use(async (req, res, next) => {
   if (!auth) {
     next();
   } else if (auth.startsWith(prefix)) {
+    console.log(auth);
     const token = auth.slice(prefix.length);
     try {
       const parsedToken = jwt.verify(token, process.env.JWT_SECRET);
@@ -31,10 +32,10 @@ apiRouter.use(async (req, res, next) => {
   next();
 });
 
-//register routes for requests that have form {baseURL/api/books}
+//register routes {baseURL/api/books}
 apiRouter.use("/books", require("./books"));
 
-//registers routes for requests of form {baseURL/api/users}
+//registers routes {baseURL/api/users}
 apiRouter.use("/users", require("./users"));
 
 //baseurl/api

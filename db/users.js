@@ -25,7 +25,6 @@ const createUser = async ({
   }
 };
 
-// const getUserByEmail(email)
 const getUserByEmail = async (email) => {
   try {
     const SQL = `SELECT * FROM users WHERE email=$1`;
@@ -34,7 +33,7 @@ const getUserByEmail = async (email) => {
     } = await client.query(SQL, [email]);
     return result;
   } catch (err) {
-    console.log(err);
+    console.log("Get user error:", err);
   }
 };
 

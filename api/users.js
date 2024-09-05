@@ -11,6 +11,8 @@ const {
 
 const jwt = require("jsonwebtoken");
 
+const { requireUser } = require("./utils");
+
 userRouter.get("/", async (req, res, next) => {
   try {
     const results = await getUsers();
@@ -20,53 +22,51 @@ userRouter.get("/", async (req, res, next) => {
   }
 });
 
-// {baseURL}/users/:id
-userRouter.get("/", async (req, res, next) => {
-  try {
-    const { id } = req.params;
-    const result = await getUserById(id);
-    res.send(result);
-  } catch (err) {
-    next(err);
-  }
+// {baseURL}
+// userRouter.get("/:id", async(req,res,next)=>{
+
+// {baseURL}
+userRouter.get("/me", requireUser, (req, res) => {
+  res.send("Account Information");
 });
 
-// {baseURL}/users/me
-userRouter.get("/me", (req, res) => {
-  res.send("Here is your account info");
-});
-
-// POST request to {baseURL/api/users/register}
+// POST request {baseURL/api/users/register}
 userRouter.post("/register", async (req, res, next) => {
   const { firstname, lastname, email, password } = req.body;
   if (!email) {
-    next({ name: "EmailRequiredError", message: "Email not provided" });
+    next({
+      name: "EmailRequiredError",
+      message: "Email Not Provided",
+    });
     return;
   }
+
   if (!password) {
-    next({ name: "PasswordRequiredError", message: "Password not provided" });
+    next({ name: "PasswordRequiredError", message: "Password Not Provided" });
     return;
   }
+
   try {
     const existingUser = await getUserByEmail(email);
     if (existingUser) {
       next({
         name: "ExistingUserError",
-        message: "User already registered with that email",
+        message: "User is Registered with that Email",
       });
       return;
     }
 
     const result = await createUser(req.body);
     if (result) {
-      //TODO(check) userRouter may be result
+      //TODO
       const token = jwt.sign(
         { id: userRouter.id, email },
         process.env.JWT_SECRET,
         { expiresIn: "1w" }
       );
+
       res.send({
-        message: "Registration Successful!",
+        message: "Registration is Successful!",
         token,
         user: {
           id: result.id,
@@ -78,12 +78,14 @@ userRouter.post("/register", async (req, res, next) => {
     } else {
       next({
         name: "RegistrationError",
-        message: "error registering, try again later",
+        message: "Error Registering, Try Later",
       });
       return;
     }
+
     res.send("Success");
   } catch (err) {
+    console.log("Register Error:", err);
     next(err);
   }
 });
@@ -94,7 +96,7 @@ userRouter.post("/login", async (req, res, next) => {
   if (!email || !password) {
     next({
       name: "MissingCredentialsError",
-      message: "Please supply both an email and password",
+      message: "Please give your Email and Password",
     });
   }
   try {
@@ -108,7 +110,7 @@ userRouter.post("/login", async (req, res, next) => {
     } else {
       next({
         name: "IncorrectCredentialsError",
-        message: "Username or password is incorrect",
+        message: "Username or Password is Incorrect",
       });
     }
   } catch (err) {
@@ -118,7 +120,7 @@ userRouter.post("/login", async (req, res, next) => {
 
 userRouter.get("/test", async (req, res, next) => {
   try {
-    //TODO(Typo) Check if this is supposed to be resjson()
+    //need to check
     res.json();
   } catch (err) {
     next(err);
