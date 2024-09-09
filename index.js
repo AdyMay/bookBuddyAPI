@@ -8,7 +8,6 @@ app.use(express.json());
 
 // we're registering the routes in /api/index.js ===> IOW, request to /api
 // ---> send request to /api/index.js
-
 app.use("/api", require("./api"));
 
 app.get("/", (req, res) => {
@@ -16,9 +15,9 @@ app.get("/", (req, res) => {
 });
 
 app.use((error, req, res, next) => {
-  console.log("Error", error);
+  console.log("ERROR ", error);
   res.send({
-    message: "Something Broke",
+    message: "SOMETHING WENT WRONG",
   });
 });
 
